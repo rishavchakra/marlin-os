@@ -1,3 +1,5 @@
+const console = @import("console.zig");
+
 const ALIGN = 1 << 0;
 const MEMINFO = 1 << 1;
 const MAGIC = 0x1BADB002;
@@ -15,5 +17,6 @@ export var multiboot align(4) linksection(".multiboot") = MultibootHeader{
 };
 
 export fn kernel_main() void {
-
+    console.init();
+    console.putString("Hello Marlin!\n");
 }
