@@ -69,24 +69,35 @@ pub fn setColor(color: VgaColor) void {
 }
 
 pub fn putCharAt(char: u8, color: VgaColor, x: usize, y: usize) void {
-    const index = x + ( y * VGA_WIDTH );
+    const index = x + (y * VGA_WIDTH);
     const vga_entry = initVgaCharacter(char, color);
     console_buffer[index] = vga_entry;
 }
 
 pub fn putChar(char: u8) void {
-    putCharAt(char, cursor_color, cursor_col, cursor_row);
+    switch (char) {
+        '\n' => {
+            cursor_col = 0;
+            cursor_row += 1;
+        },
+        else => {
+            putCharAt(char, cursor_color, cursor_col, cursor_row);
+            cursor_col += 1;
+        },
+    }
 
-    cursor_col += 1;
     if (cursor_col == VGA_WIDTH) {
         // Reach the end of console row
         cursor_col = 0;
         cursor_row += 1;
-
-        if (cursor_row == VGA_HEIGHT) {
-            // Reached end of last console row
-            cursor_row = 0;
+    }
+    if (cursor_row == VGA_HEIGHT) {
+        // Reached end of last console row
+        for (0..VGA_SIZE - VGA_WIDTH) |i| {
+            console_buffer[i] = console_buffer[i + VGA_WIDTH];
         }
+        @memset(console_buffer[VGA_SIZE - VGA_WIDTH..VGA_SIZE], initVgaCharacter(' ', cursor_color));
+        cursor_row = VGA_HEIGHT - 1;
     }
 }
 
