@@ -11,19 +11,8 @@ pub fn build(b: *std.Build) void {
 
     const kernel_main_path = b.path("src/main.zig");
     const linker_script_path = b.path("linker.ld");
-    const boot_script_path = b.path("boot.asm");
-    const boot_obj_path = b.path("build/boot.o");
     const gdt_script_path = b.path("src/gdt.asm");
     const gdt_obj_path = b.path("build/gdt.o");
-
-    const build_boot_script_cmd = b.addSystemCommand(&.{
-        "nasm",
-        boot_script_path.src_path.sub_path,
-        "-felf",
-        "-o build/boot.o",
-    });
-    b.default_step.dependOn(&build_boot_script_cmd.step);
-    log.info("boot.asm -> boot.o", .{});
 
     const gdt_script_cmd = b.addSystemCommand(&.{
         "nasm",
@@ -36,7 +25,6 @@ pub fn build(b: *std.Build) void {
 
     const kernel = b.addExecutable(.{ .name = "marlin-os.elf", .root_source_file = kernel_main_path, .optimize = optimize, .target = target });
     kernel.setLinkerScript(linker_script_path);
-    kernel.addObjectFile(boot_obj_path);
     kernel.addObjectFile(gdt_obj_path);
 
     b.installArtifact(kernel);
