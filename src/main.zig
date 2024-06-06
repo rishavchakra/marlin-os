@@ -1,4 +1,5 @@
 const console = @import("console.zig");
+const gdt = @import("global_descriptor_table.zig");
 
 const ALIGN = 1 << 0;
 const MEMINFO = 1 << 1;
@@ -19,4 +20,6 @@ export var multiboot align(4) linksection(".multiboot") = MultibootHeader{
 export fn kernel_main() void {
     console.init();
     console.putString("Hello Marlin!\n");
+    gdt.init();
+    console.putString("GDT Initialized\n");
 }
