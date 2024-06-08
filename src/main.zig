@@ -1,5 +1,6 @@
 const console = @import("console.zig");
 const gdt = @import("global_descriptor_table.zig");
+const idt = @import("interrupt_descriptor_table.zig");
 
 const ALIGN = 1 << 0;
 const MEMINFO = 1 << 1;
@@ -42,4 +43,6 @@ export fn kernel_main() void {
     console.putString("Hello Marlin!\n");
     gdt.init();
     console.putString("GDT Initialized\n");
+    idt.init();
+    console.putString("IDT Initialized\n");
 }

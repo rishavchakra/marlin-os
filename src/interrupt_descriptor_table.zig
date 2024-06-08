@@ -1,0 +1,347 @@
+const std = @import("std");
+const expect = std.testing.expect;
+const expectEqual = std.testing.expectEqual;
+
+////////////////////////////////
+// Type definitions
+////////////////////////////////
+
+const IDTEntry32 = packed struct {
+    base_low: u16,
+    segment_selector: u16,
+    reserved: u8 = 0,
+    attributes: IDTAttributes,
+    base_high: u16,
+
+    fn init(base: u32, segment: u16, attributes: u8) IDTEntry32 {
+        return IDTEntry32{
+            .base_low = @truncate(base & 0xFFFF),
+            .base_high = @truncate((base >> 16) & 0xFFFF),
+
+            .segment_selector = segment,
+            .attributes = @bitCast(attributes),
+        };
+    }
+};
+
+const IDTAttributes = packed struct {
+    gate_type: IDT32GateType,
+    reserved: u1 = 0,
+    ring: u2,
+    present: u1,
+};
+
+const IDT32GateType = enum(u4) {
+    TaskGate = 0x5,
+    Interrupt16 = 0x6,
+    Trap16 = 0x7,
+    Interrupt32 = 0xE,
+    Trap32 = 0xF,
+};
+
+////////////////////////////////
+// Member variables
+////////////////////////////////
+
+const idt_32_null: IDTEntry32 = @bitCast(@as(u64, 0));
+
+const idt_32: [256]IDTEntry32 = [_]IDTEntry32{
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+    idt_32_null,
+};
+
+////////////////////////////////
+// Functions
+////////////////////////////////
+
+pub fn init() void {
+    setIDT32(@sizeOf(IDTEntry32) * idt_32.len - 1, @intFromPtr(&idt_32));
+}
+
+extern fn setIDT32(limit: u16, base: u32) void;
+
+////////////////////////////////
+// Testing
+////////////////////////////////
+
+test "IDT entry sizes" {
+    try expectEqual(@bitSizeOf(IDTEntry32), 64);
+    try expectEqual(@bitSizeOf(IDTAttributes), 8);
+    try expectEqual(@bitSizeOf(IDT32GateType), 4);
+}
+
+test "IDT layout" {
+    const test_idt = IDTEntry32.init(0x01234567, 0x1234, 0xAE);
+    // zig fmt: off
+    const manual_idt = IDTEntry32{
+        .base_low = 0x4567,
+        .base_high = 0x0123,
+        .segment_selector = 0x1234,
+        .attributes = IDTAttributes{
+            .gate_type = .Interrupt32,
+            .ring = 1,
+            .present = 1
+        }
+    };
+
+    try expectEqual(test_idt.base_low, manual_idt.base_low);
+    try expectEqual(test_idt.base_high, manual_idt.base_high);
+    try expectEqual(test_idt.segment_selector, manual_idt.segment_selector);
+    try expectEqual(test_idt.attributes.gate_type, manual_idt.attributes.gate_type);
+    try expectEqual(test_idt.attributes.ring, manual_idt.attributes.ring);
+    try expectEqual(test_idt.attributes.present, manual_idt.attributes.present);
+}
